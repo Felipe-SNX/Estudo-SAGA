@@ -3,6 +3,7 @@ package br.com.microservices.orchestrated.orchestratorservice.config.kafka;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -11,18 +12,34 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
+import br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.BASE_ORCHESTRATOR;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.FINISH_FAIL;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.FINISH_SUCCESS;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.INVENTORY_FAIL;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.INVENTORY_SUCCESS;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.NOTIFY_ENDING;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.PAYMENT_FAIL;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.PAYMENT_SUCCESS;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.PRODUCT_VALIDATION_FAIL;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.PRODUCT_VALIDATION_SUCCESS;
+import static br.com.microservices.orchestrated.orchestratorservice.core.enums.ETopics.START_SAGA;
 import lombok.RequiredArgsConstructor;
 
 @EnableKafka
 @Configuration
 @RequiredArgsConstructor
 public class KafkaConfig {
+
+    private static final Integer PARTITION_COUNT = 1; 
+    private static final Integer REPLICA_COUNT = 1; 
     
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -30,7 +47,7 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
-    @Value("${spring.kafka.consumer.auto-offest-reset}")
+    @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String autoOffsetReset;
 
     @Bean
@@ -64,5 +81,69 @@ public class KafkaConfig {
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory){
         return new KafkaTemplate<>(producerFactory);
+    }
+
+    private NewTopic buildTopic(String name){
+        return TopicBuilder
+                .name(name)
+                .replicas(REPLICA_COUNT)
+                .partitions(PARTITION_COUNT)
+                .build();
+                    
+    }
+
+    @Bean
+    public NewTopic startSagaTopic(){
+        return buildTopic(START_SAGA.getTopic());
+    }
+
+    @Bean
+    public NewTopic orchestratorTopic(){
+        return buildTopic(BASE_ORCHESTRATOR.getTopic());
+    }
+
+    @Bean
+    public NewTopic finishSuccessTopic(){
+        return buildTopic(FINISH_SUCCESS.getTopic());
+    }
+
+    @Bean
+    public NewTopic finishFailTopic(){
+        return buildTopic(FINISH_FAIL.getTopic());
+    }
+
+    @Bean
+    public NewTopic inventorySuccessTopic(){
+        return buildTopic(INVENTORY_SUCCESS.getTopic());
+    }
+
+    @Bean
+    public NewTopic inventoryFailTopic(){
+        return buildTopic(INVENTORY_FAIL.getTopic());
+    }
+
+    @Bean
+    public NewTopic paymentSuccessTopic(){
+        return buildTopic(PAYMENT_SUCCESS.getTopic());
+    }
+
+    @Bean
+    public NewTopic paymentFailTopic(){
+        return buildTopic(PAYMENT_FAIL.getTopic());
+    }
+
+    @Bean
+    public NewTopic productValidationSuccessTopic(){
+        return buildTopic(PRODUCT_VALIDATION_SUCCESS.getTopic());
+    }
+
+    @Bean
+    public NewTopic productValidationFailTopic(){
+        return buildTopic(PRODUCT_VALIDATION_FAIL.getTopic());
+    }
+
+    @Bean
+    public NewTopic notifyEndingTopic(){
+        return buildTopic(NOTIFY_ENDING.getTopic());
     }
 }
