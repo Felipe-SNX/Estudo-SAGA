@@ -1,4 +1,4 @@
-package br.com.microservices.orchestrated.orderservice.config.kafka;
+package br.com.microservices.orchestrated.orchestratorservice.config.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
