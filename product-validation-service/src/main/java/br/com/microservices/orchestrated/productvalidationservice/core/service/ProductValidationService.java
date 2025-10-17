@@ -111,8 +111,6 @@ public class ProductValidationService {
                 validation.setSuccess(false);
                 validationRepository.save(validation);
             },
-            () -> {
-
-            });
+            () -> createValidation(event, false));
     }
 }
