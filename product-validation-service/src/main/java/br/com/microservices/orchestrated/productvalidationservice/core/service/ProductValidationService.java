@@ -1,10 +1,21 @@
-package main.java.br.com.microservices.orchestrated.productvalidationservice.core.service;
+package br.com.microservices.orchestrated.productvalidationservice.core.service;
 
 import java.time.LocalDateTime;
+import br.com.microservices.orchestrated.productvalidationservice.config.exception.ValidationException;
+import br.com.microservices.orchestrated.productvalidationservice.core.dto.Event;
+import br.com.microservices.orchestrated.productvalidationservice.core.dto.History;
+import br.com.microservices.orchestrated.productvalidationservice.core.dto.OrderProducts;
+import br.com.microservices.orchestrated.productvalidationservice.core.model.Validation;
+import br.com.microservices.orchestrated.productvalidationservice.core.producer.KafkaProducer;
+import br.com.microservices.orchestrated.productvalidationservice.core.repository.ProductRepository;
+import br.com.microservices.orchestrated.productvalidationservice.core.utils.JsonUtil;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import br.com.microservices.orchestrated.productvalidationservice.core.repository.ValidationRepository;
 
-import br.com.microservices.orchestrated.orderservice.core.document.Event;
-import br.com.microservices.orchestrated.orderservice.core.document.History;
-import br.com.microservices.orchestrated.orderservice.core.document.OrderProducts;
+import static br.com.microservices.orchestrated.productvalidationservice.core.enums.ESagaStatus.*;
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Slf4j
 @Service
@@ -22,7 +33,7 @@ public class ProductValidationService {
             checkCurrentValidation(event);
             createValidation(event, true);
             handleSuccess(event);
-        } catch (Exception e){
+        } catch (Exception ex){
             log.error("error trying to validate products: ", ex);
             handleFailCurrentNotExecuted(event, ex.getMessage());
         }
@@ -96,7 +107,7 @@ public class ProductValidationService {
         addHistory(event, "Fail to validate products: ".concat(message));
     }
 
-    public void roolbackEvent(Event event){
+    public void rollbackEvent(Event event){
         changeValidationToFail(event);
         event.setStatus(FAIL);
         event.setSource(CURRENT_SOURCE);

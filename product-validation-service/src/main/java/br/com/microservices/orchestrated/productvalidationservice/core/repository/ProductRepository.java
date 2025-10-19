@@ -1,6 +1,9 @@
-package main.java.br.com.microservices.orchestrated.productvalidationservice.core.repository;
+package br.com.microservices.orchestrated.productvalidationservice.core.repository;
 
-public interface ProductRepository extends JpaRepository<Product, Integer>{
+import br.com.microservices.orchestrated.productvalidationservice.core.model.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Boolean existsByCode(String code);
     

@@ -1,6 +1,9 @@
-package main.java.br.com.microservices.orchestrated.productvalidationservice.core.model;
+package br.com.microservices.orchestrated.productvalidationservice.core.model;
 
-import javax.annotation.processing.Generated;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity

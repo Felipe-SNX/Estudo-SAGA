@@ -2,12 +2,15 @@ package br.com.microservices.orchestrated.productvalidationservice.core.dto;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.microservices.orchestrated.productvalidationservice.core.enums.ESagaStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Data
 @Builder
