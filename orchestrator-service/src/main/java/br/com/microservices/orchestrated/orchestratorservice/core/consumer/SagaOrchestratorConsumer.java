@@ -8,14 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class SagaOrchestratorConsumer {
 
     private final JsonUtil jsonUtil;
+    private final OrchestratorService orchestratorService;
 
-    public SagaOrchestratorConsumer(JsonUtil jsonUtil){
-        this.jsonUtil = jsonUtil;
-    }
-    
     @KafkaListener(
         groupId = "${spring.kafka.consumer.group-id}",
         topics = "${spring.kafka.topic.start-saga}"
@@ -23,7 +21,7 @@ public class SagaOrchestratorConsumer {
     public void consumeStartSagaEvent(String payload){
         log.info("Receiving event {} from start-saga topic", payload);
         var event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        orchestratorService.startSaga(event);
     }
 
     @KafkaListener(
@@ -33,7 +31,7 @@ public class SagaOrchestratorConsumer {
     public void consumeOrchestratorEvent(String payload){
         log.info("Receiving event {} from orchestrator topic", payload);
         var event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        orchestratorService.continueSaga(event);
     }
 
     @KafkaListener(
@@ -43,7 +41,7 @@ public class SagaOrchestratorConsumer {
     public void consumeFinishSuccessEvent(String payload){
         log.info("Receiving event {} from finish-success topic", payload);
         var event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        orchestratorService.finishSagaSuccess(event);
     }
 
     @KafkaListener(
