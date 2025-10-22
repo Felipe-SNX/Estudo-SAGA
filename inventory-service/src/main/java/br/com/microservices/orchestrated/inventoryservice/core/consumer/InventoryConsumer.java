@@ -8,13 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class InventoryConsumer {
 
     private final JsonUtil jsonUtil;
-
-    public InventoryConsumer(JsonUtil jsonUtil){
-        this.jsonUtil = jsonUtil;
-    }
+    private final InventoryService inventoryService;
     
     @KafkaListener(
         groupId = "${spring.kafka.consumer.group-id}",
@@ -23,7 +21,7 @@ public class InventoryConsumer {
     public void consumeSuccessEvent(String payload){
         log.info("Receiving success event {} from inventory-success topic", payload);
         var event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        inventoryService.updateInventory(event);
     }
 
     @KafkaListener(
@@ -33,7 +31,7 @@ public class InventoryConsumer {
     public void consumeFailEvent(String payload){
         log.info("Receiving rollback event {} from inventory-fail topic", payload);
         var event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        inventoryService.rollbackinventory(event);
     }
 
 }
